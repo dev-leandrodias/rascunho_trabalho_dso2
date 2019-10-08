@@ -24,14 +24,17 @@ export default class AlunoScreen extends React.Component {
     this.state = {
       isLoading: false,
       codigo: codigo,
-      pessoas: [{ pessoa: { nome: '' } }],
+      pessoas: [],
       isDateTimePickerInicialVisible: false,
       isDateTimePickerFinalVisible: false,
       dataInicial: moment().format('DD/MM/YYYY'),
       dataFinal: moment().format('DD/MM/YYYY'),
-      pagina: 1
+      pagina: 1,
+      msg: null,
+      errorData: false
 
     };
+    console.log(!this.state.isLoading && this.state.pessoas.length == 0 && this.state.pagina == 1)
   }
 
   showDateTimePickerInicial = () => {
@@ -67,49 +70,84 @@ export default class AlunoScreen extends React.Component {
     this.hideDateTimePickerFinal();
   };
 
-
-
-
   handleSeach() {
     const { codigo, dataInicial, dataFinal } = this.state;
-    console.log(this.state)
-    console.log(codigo, dataInicial, dataFinal)
-    axios.get('http://www.transparencia.gov.br/api-de-dados/viagens', {
-      params: {
-        dataIdaDe: dataInicial,
-        dataIdaAte: dataFinal,
-        dataRetornoDe: dataInicial,
-        dataRetornoAte: dataFinal,
-        codigoOrgao: codigo,
-        pagina: 1
-      }
-    }).then((res, req) => {
-      console.log(res)
+    let dateInit = moment(dataInicial,'DD/MM/YYYY');
+    let dateFim = moment(dataFinal,'DD/MM/YYYY');
+    let diff = moment.duration( dateFim - dateInit , 'milliseconds');
+    let diffDay = dateInit.diff(dateFim, 'month')
+    let msg = '';
+    if (dateFim < dateInit) {
+      msg = "Data inicial nao pode ser menor que a data final"
       this.setState({
-        isLoading: false,
-        // alunos: responseJson,
-        pessoas: res.data,
-        pagina: 1
-      })
-    }).catch((error) => {
-      console.log(error)
-      this.setState({
-        isLoading: false,
-        // alunos: responseJson,
-        pessoas: [{ pessoa: { nome: '' } }],
+        msg,
+        errorData: true
       });
-    });
-    this.setState({
-      isLoading: true,
-      // alunos: responseJson,
-      pessoas: [{ pessoa: { nome: '' } }],
-    })
+        return ;
+    } else if ((diffDay < 0) || (diffDay > 0)) {
+      msg = "Selecione um perido maximo de ate 30 dias"
+      this.setState({
+        msg,
+        errorData: true
 
+      });
+      return ;
 
+    } else {
+
+      axios.get('http://www.transparencia.gov.br/api-de-dados/viagens', {
+        params: {
+          dataIdaDe: dataInicial,
+          dataIdaAte: dataFinal,
+          dataRetornoDe: dataInicial,
+          dataRetornoAte: dataFinal,
+          codigoOrgao: codigo,
+          pagina: 1
+        }
+      }).then((res, req) => {
+        console.log(res)
+
+        if (res.data.length == 0) {
+          this.setState({
+            isLoading: false,
+            // alunos: responseJson,
+            pessoas: [],
+            msg: 'Sem registro',
+            errorData: false
+          })
+
+        } else {
+          this.setState({
+            isLoading: false,
+            // alunos: responseJson,
+            pessoas: res.data,
+            pagina: 1,
+            errorData: false
+
+          })
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.setState({
+          isLoading: false,
+          // alunos: responseJson,
+          pessoas: [],
+          errorData:false
+        });
+      });
+      this.setState({
+        isLoading: true,
+        // alunos: responseJson,
+        pessoas: [],
+        errorData:false
+
+      })
+
+    }
   }
 
   handleNextPage() {
-    const { codigo, dataInicial, dataFinal,pagina } = this.state;
+    const { codigo, dataInicial, dataFinal, pagina } = this.state;
     let pag = pagina;
     let pageInit = pagina;
     pag++;
@@ -123,27 +161,37 @@ export default class AlunoScreen extends React.Component {
         pagina: pag
       }
     }).then((res, req) => {
-      console.log(res)
-      this.setState({
-        isLoading: false,
-        // alunos: responseJson,
-        pessoas: res.data,
-        pagina: pagina
-      })
+      if (res.data.length == 0) {
+        this.setState({
+          isLoading: false,
+          // alunos: responseJson,
+          pagina: pag,
+          pessoas: [],
+          msg: 'Sem registro nesta pagina'
+        })
+      } else {
+        console.log(res)
+        this.setState({
+          isLoading: false,
+          // alunos: responseJson,
+          pessoas: res.data,
+          pagina: pagina
+        })
+      }
     }).catch((error) => {
       console.log(error)
-  
+
       this.setState({
         isLoading: false,
         // alunos: responseJson,
-        pagina:pageInit,
-        pessoas: [{ pessoa: { nome: '' } }],
+        pagina: pageInit,
+        pessoas: [],
       });
     });
     this.setState({
       isLoading: true,
       // alunos: responseJson,
-      pessoas: [{ pessoa: { nome: '' } }],
+      pessoas: [],
     })
 
 
@@ -151,49 +199,78 @@ export default class AlunoScreen extends React.Component {
 
 
   handleLastPage() {
-    const { codigo, dataInicial, dataFinal,pagina } = this.state;
+    const { codigo, dataInicial, dataFinal, pagina } = this.state;
     let pag = pagina;
     let pageInit = pagina;
-    if (pag >= 2) {
+    if (pag > 1) {
       pag--;
     }
+    console.log('teste', this.state)
+
     axios.get('http://www.transparencia.gov.br/api-de-dados/viagens', {
       params: {
         dataIdaDe: dataInicial,
-        dataIdaAte: dataInicial,
-        dataRetornoDe: dataFinal,
+        dataIdaAte: dataFinal,
+        dataRetornoDe: dataInicial,
         dataRetornoAte: dataFinal,
         codigoOrgao: codigo,
-        pagina: pagina
+        pagina: pag
       }
     }).then((res, req) => {
-      console.log(res)
       this.setState({
         isLoading: false,
         // alunos: responseJson,
         pessoas: res.data,
-        pagina: pagina
+        pagina: pag
       })
     }).catch((error) => {
-      console.log(error)
       this.setState({
         isLoading: false,
         // alunos: responseJson,,
-        pagina:pageInit,
-        pessoas: [{ pessoa: { nome: '' } }],
+        pagina: pageInit,
+        pessoas: [],
       });
     });
     this.setState({
       isLoading: true,
       // alunos: responseJson,
-      pessoas: [{ pessoa: { nome: '' } }],
+      pessoas: [],
     })
 
 
   }
 
+  handleVerifyDate() {
+    // let dateInit = moment(this.state.dataInicial).valueOf();
+    // let dateFim = moment(this.state.dataFinal).valueOf();
+    // let diff = dateInit - dateFim;
+    // let diffDay = moment.duration(diff)
+    // let msg1 = '';
+    let teste = false;
+    if (dateFim < dateInit) {
+      msg1 = "Data inicial nao pode ser menor que a data final"
+      teste = true;
+      this.setState({
+        msg1
+      });
+
+    } else if (diffDay > 30 || diffDay < -30) {
+      msg1 = "Selecione um perido maximo de 30 dias"
+      teste = true;
+      this.setState({
+        msg1
+      });
+    }
+
+
+
+    return teste;
+  }
 
   render() {
+    const { navigate } = this.props.navigation;
+    const { codigo, dataInicial, dataFinal } = this.state;
+
     if (this.state.isLoading) {
       return (
         <View style={{ flex: 1, padding: 20 }}>
@@ -201,8 +278,96 @@ export default class AlunoScreen extends React.Component {
         </View>
       )
     }
-    const { navigate } = this.props.navigation;
-    const { codigo, dataInicial, dataFinal } = this.state;
+    if (!this.state.isLoading && this.state.errorData) {
+      return (
+        <View style={styles.container}>
+          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Text>{dataInicial}</Text>
+
+          <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerInicialVisible}
+            onConfirm={this.handleDatePickedInicial}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerFinalVisible}
+            onConfirm={this.handleDatePickedFinal}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <Text>{dataFinal}</Text>
+          <Button title="data final da pesquisa" onPress={this.showDateTimePickerFinal} />
+          <Button title="Busca" onPress={() => this.handleSeach()} />
+          <Text>{this.state.msg}</Text>
+        </View>
+      );
+    }
+
+    if (!this.state.isLoading && this.state.pessoas.length == 0 && this.state.pagina == 1) {
+      return (
+        <View style={styles.container}>
+          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Text>{dataInicial}</Text>
+
+          <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerInicialVisible}
+            onConfirm={this.handleDatePickedInicial}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerFinalVisible}
+            onConfirm={this.handleDatePickedFinal}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <Text>{dataFinal}</Text>
+          <Button title="data final da pesquisa" onPress={this.showDateTimePickerFinal} />
+          <Button title="Busca" onPress={() => this.handleSeach()} />
+          <Text>{this.state.msg}</Text>
+        </View>
+      );
+    }
+
+    if (!this.state.isLoading && this.state.pessoas.length == 0 && this.state.pagina > 1) {
+      return (
+        <View style={styles.container}>
+          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Text>{dataInicial}</Text>
+
+          <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerInicialVisible}
+            onConfirm={this.handleDatePickedInicial}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <DateTimePicker
+            isVisible={this.state.isDateTimePickerFinalVisible}
+            onConfirm={this.handleDatePickedFinal}
+            onCancel={this.hideDateTimePickerFinal}
+            mode={"date"}
+          />
+          <Text>{dataFinal}</Text>
+          <Button title="data final da pesquisa" onPress={this.showDateTimePickerFinal} />
+          <Button title="Busuhuhuhuhuca" onPress={() => this.handleSeach()} />
+          <Text>{this.state.msg}</Text>
+
+          <View style={styles.containerFooter}>
+            <View style={styles.button}>
+              <Button
+                title="aterior"
+                onPress={() => this.handleLastPage()}
+              />
+            </View>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.container}>
         <Button title="Voltar" onPress={() => navigate('Alunos')} />
@@ -229,14 +394,14 @@ export default class AlunoScreen extends React.Component {
           data={this.state.pessoas}
           renderItem={({ item }) =>
             <TouchableOpacity onPress={() => {
-              navigate('Pessoa', {'pessoa': item})
+              navigate('Pessoa', { 'pessoa': item })
             }}>
               <View>
                 <Text style={styles.item}> {item.pessoa.nome}</Text>
               </View>
             </TouchableOpacity>}
         />
-         <View style={styles.containerFooter}>
+        <View style={styles.containerFooter}>
           <View style={styles.button}>
             <Button
               title="aterior"
@@ -260,7 +425,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 22,
-    width:390
+    width: 390
 
   },
 
@@ -274,5 +439,5 @@ const styles = StyleSheet.create({
     width: '40%',
     height: 40
   }
-  
+
 });

@@ -11,9 +11,10 @@ export default class AlunosScreen extends React.Component {
     this.state = {
       isLoading: true,
       text: '',
-      orgao: [{
-      }],
-      pagina: 1
+      orgao: [],
+      pagina: 1,
+      msg: 'sem registros'
+
     }
   }
 
@@ -30,7 +31,9 @@ export default class AlunosScreen extends React.Component {
       text: '',
       orgao: [{
       }],
-      pagina: 1
+      pagina: 1,
+      msg: 'sem registros'
+
     });
 
   }
@@ -48,7 +51,6 @@ export default class AlunosScreen extends React.Component {
   }
   handleSeach() {
     const { text, pagina } = this.state;
-    console.log(this.state)
     axios.get('http://www.transparencia.gov.br/api-de-dados/orgaos-siafi', {
       params: {
         descricao: this.state.text,
@@ -61,6 +63,9 @@ export default class AlunosScreen extends React.Component {
         orgao: res.data,
         pagina: 1
       })
+      console.log(this.state.orgao.length)
+      console.log(!this.state.isLoading && !this.state.orgao.length)
+
     }).catch((error) => {
       this.setState({
         isLoading: false,
@@ -161,6 +166,56 @@ export default class AlunosScreen extends React.Component {
       )
     }
 
+    if (!this.state.isLoading && this.state.orgao.length == 0 && !this.state.pagina == 1) {
+      return (
+        <View style={styles.container}>
+          <TextInput
+            style={{ height: 40 }}
+            placeholder="Informe o nome do Orgão desejado"
+            onChangeText={(text) => this.setState({ text })}
+            value={this.state.text}
+          />
+          <Button
+            title="Buscar"
+            onPress={() => this.handleSeach()}
+          />
+          <Text>{this.state.msg}</Text>
+        </View>
+      );
+    }
+
+    if (!this.state.isLoading && this.state.orgao.length == 0 && this.state.pagina > 1) {
+      return (
+        <View style={styles.container}>
+          <TextInput
+            style={{ height: 40 }}
+            placeholder="Informe o nome do Orgão desejado"
+            onChangeText={(text) => this.setState({ text })}
+            value={this.state.text}
+          />
+          <Button
+            title="Buscar"
+            onPress={() => this.handleSeach()}
+          />
+          <Text>{this.state.msg}</Text>
+          <View style={styles.containerFooter}>
+            <View style={styles.button}>
+              <Button
+                title="aterior"
+                onPress={() => this.handleLastPage()}
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                title="Proxima"
+                onPress={() => this.handleNextPage()}
+              />
+            </View>
+          </View>
+        </View>
+      );
+    }
+
     const { navigate } = this.props.navigation;
     return (
       <View style={styles.container}>
@@ -175,16 +230,20 @@ export default class AlunosScreen extends React.Component {
           title="Buscar"
           onPress={() => this.handleSeach()}
         />
+
         <FlatList
           style={{ paddingBottom: 41 }}
           data={this.state.orgao}
+          keyExtractor={item => item.codigo}
           renderItem={({ item }) =>
             <TouchableOpacity onPress={() => {
               this.initCompoment();
               navigate('Aluno', { codigo: item.codigo })
-            }}>
-              <View>
-                <Text numberOfLines={3} style={styles.item}> {item.codigoDescricaoFormatado}</Text>
+            }}
+
+            >
+              <View  >
+                <Text numberOfLines={3} style={styles.item} > {item.codigoDescricaoFormatado}</Text>
               </View>
             </TouchableOpacity>}
         />
