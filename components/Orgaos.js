@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextInput, Text, View, StyleSheet, Button, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import axios from 'axios'
-export default class AlunosScreen extends React.Component {
+export default class OrgaosScreen extends React.Component {
   static navigationOptions = {
     title: 'Listagem de Orgons',
   };
@@ -59,7 +59,7 @@ export default class AlunosScreen extends React.Component {
     }).then((res, req) => {
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         orgao: res.data,
         pagina: 1
       })
@@ -69,13 +69,13 @@ export default class AlunosScreen extends React.Component {
     }).catch((error) => {
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         orgao: [{}]
       })
     });
     this.setState({
       isLoading: true,
-      // alunos: responseJson,
+      // Orgaos: responseJson,
       orgao: [{}]
     })
 
@@ -107,14 +107,14 @@ export default class AlunosScreen extends React.Component {
 
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         pagina: pageInit,
         orgao: [{}]
       })
     });
     this.setState({
       isLoading: true,
-      // alunos: responseJson,
+      // Orgaos: responseJson,
       orgao: [{}]
     })
   }
@@ -136,14 +136,14 @@ export default class AlunosScreen extends React.Component {
       console.log(res)
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         orgao: res.data,
         pagina: pag
       })
     }).catch((error) => {
       this.setState({
         isLoading: true,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         pagina: pageInit,
         orgao: [{}]
       })
@@ -151,7 +151,7 @@ export default class AlunosScreen extends React.Component {
 
     this.setState({
       isLoading: true,
-      // alunos: responseJson,
+      // Orgaos: responseJson,
       orgao: [{}]
     })
   }
@@ -197,7 +197,7 @@ export default class AlunosScreen extends React.Component {
             title="Buscar"
             onPress={() => this.handleSeach()}
           />
-          <Text>{this.state.msg}</Text>
+          <Text >{this.state.msg}</Text>
           <View style={styles.containerFooter}>
             <View style={styles.button}>
               <Button
@@ -238,12 +238,12 @@ export default class AlunosScreen extends React.Component {
           renderItem={({ item }) =>
             <TouchableOpacity onPress={() => {
               this.initCompoment();
-              navigate('Aluno', { codigo: item.codigo })
+              navigate('Orgao', { codigo: item.codigo })
             }}
 
             >
               <View  >
-                <Text numberOfLines={3} style={styles.item} > {item.codigoDescricaoFormatado}</Text>
+                <Text numberOfLines={100} style={styles.item} > {item.codigoDescricaoFormatado}</Text>
               </View>
             </TouchableOpacity>}
         />
@@ -277,8 +277,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     fontSize: 18,
-    height: 44,
     width: 388,
+    flexDirection: 'column',
 
   },
 

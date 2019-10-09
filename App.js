@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
- import AlunosScreen from './components/Alunos'
+ import OrgaosScreen from './components/Orgaos'
 import HomeScreen from './components/Home'
-import AlunoScreen from './components/Aluno'
+import OrgaoScreen from './components/Orgao'
 import PessoaScreen from './components/Pessoa'
  
 
@@ -17,8 +17,8 @@ import PessoaScreen from './components/Pessoa'
 
  const MainNavigator = createStackNavigator({
   Home: {screen: HomeScreen},
-  Alunos: {screen: AlunosScreen},
-  Aluno: {screen: AlunoScreen},
+  Orgaos: {screen: OrgaosScreen},
+  Orgao: {screen: OrgaoScreen},
   Pessoa: {screen: PessoaScreen},
 });
 

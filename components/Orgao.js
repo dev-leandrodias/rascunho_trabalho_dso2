@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
   Button,
-  TextInput,
   ActivityIndicator,
   FlatList,
   TouchableOpacity
@@ -13,9 +12,9 @@ import moment from "moment"
 
 import DateTimePicker from "react-native-modal-datetime-picker";
 import axios from "axios";
-export default class AlunoScreen extends React.Component {
+export default class Orgaoscreen extends React.Component {
   static navigationOptions = {
-    title: 'Cadastro de Aluno',
+    title: 'Cadastro de Orgao',
   };
 
   constructor(props) {
@@ -110,7 +109,7 @@ export default class AlunoScreen extends React.Component {
         if (res.data.length == 0) {
           this.setState({
             isLoading: false,
-            // alunos: responseJson,
+            // Orgaos: responseJson,
             pessoas: [],
             msg: 'Sem registro',
             errorData: false
@@ -119,7 +118,7 @@ export default class AlunoScreen extends React.Component {
         } else {
           this.setState({
             isLoading: false,
-            // alunos: responseJson,
+            // Orgaos: responseJson,
             pessoas: res.data,
             pagina: 1,
             errorData: false
@@ -130,14 +129,12 @@ export default class AlunoScreen extends React.Component {
         console.log(error)
         this.setState({
           isLoading: false,
-          // alunos: responseJson,
           pessoas: [],
           errorData:false
         });
       });
       this.setState({
         isLoading: true,
-        // alunos: responseJson,
         pessoas: [],
         errorData:false
 
@@ -164,7 +161,7 @@ export default class AlunoScreen extends React.Component {
       if (res.data.length == 0) {
         this.setState({
           isLoading: false,
-          // alunos: responseJson,
+          // Orgaos: responseJson,
           pagina: pag,
           pessoas: [],
           msg: 'Sem registro nesta pagina'
@@ -173,7 +170,7 @@ export default class AlunoScreen extends React.Component {
         console.log(res)
         this.setState({
           isLoading: false,
-          // alunos: responseJson,
+          // Orgaos: responseJson,
           pessoas: res.data,
           pagina: pagina
         })
@@ -183,14 +180,14 @@ export default class AlunoScreen extends React.Component {
 
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         pagina: pageInit,
         pessoas: [],
       });
     });
     this.setState({
       isLoading: true,
-      // alunos: responseJson,
+      // Orgaos: responseJson,
       pessoas: [],
     })
 
@@ -219,21 +216,21 @@ export default class AlunoScreen extends React.Component {
     }).then((res, req) => {
       this.setState({
         isLoading: false,
-        // alunos: responseJson,
+        // Orgaos: responseJson,
         pessoas: res.data,
         pagina: pag
       })
     }).catch((error) => {
       this.setState({
         isLoading: false,
-        // alunos: responseJson,,
+        // Orgaos: responseJson,,
         pagina: pageInit,
         pessoas: [],
       });
     });
     this.setState({
       isLoading: true,
-      // alunos: responseJson,
+      // Orgaos: responseJson,
       pessoas: [],
     })
 
@@ -281,7 +278,7 @@ export default class AlunoScreen extends React.Component {
     if (!this.state.isLoading && this.state.errorData) {
       return (
         <View style={styles.container}>
-          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Button title="Voltar" onPress={() => navigate('Orgaos')} />
           <Text>{dataInicial}</Text>
 
           <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
@@ -308,7 +305,7 @@ export default class AlunoScreen extends React.Component {
     if (!this.state.isLoading && this.state.pessoas.length == 0 && this.state.pagina == 1) {
       return (
         <View style={styles.container}>
-          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Button title="Voltar" onPress={() => navigate('Orgaos')} />
           <Text>{dataInicial}</Text>
 
           <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
@@ -335,7 +332,7 @@ export default class AlunoScreen extends React.Component {
     if (!this.state.isLoading && this.state.pessoas.length == 0 && this.state.pagina > 1) {
       return (
         <View style={styles.container}>
-          <Button title="Voltar" onPress={() => navigate('Alunos')} />
+          <Button title="Voltar" onPress={() => navigate('Orgaos')} />
           <Text>{dataInicial}</Text>
 
           <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />
@@ -370,7 +367,7 @@ export default class AlunoScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        <Button title="Voltar" onPress={() => navigate('Alunos')} />
+        <Button title="Voltar" onPress={() => navigate('Orgaos')} />
         <Text>{dataInicial}</Text>
 
         <Button title="data inicial da pesquisa" onPress={this.showDateTimePickerInicial} />

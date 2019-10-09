@@ -97,7 +97,7 @@ export default class PessoaScreen extends React.Component {
     const { navigate } = this.props.navigation;
     return (
       <View>
-        <Button title="Voltar" onPress={() => navigate('Aluno')} />
+        <Button title="Voltar" onPress={() => navigate('Orgao')} />
         <ScrollView>
           <View style={styles.container}>
             <View style={styles.padis}>
@@ -155,7 +155,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     width: 300,
     flex:1,
-    
-    
   },
 });

@@ -11,7 +11,7 @@ export default class HomeScreen extends React.Component {
       <View>
         <Button
           title="Acesse"
-          onPress={() => navigate('Alunos')}
+          onPress={() => navigate('Orgaos')}
         />
       </View>
     );
